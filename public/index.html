@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dartify - 공시 분석 자동화 플랫폼</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/notion-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- 분석 결과 리스트 사이드바 -->
+    <aside class="analysis-sidebar" id="analysisSidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">
+                <div class="sidebar-logo" onclick="goToHome()" style="cursor: pointer;">
+                    <span class="logo-text">Dartify</span>
+                </div>
+            </div>
+        </div>
+        <div class="sidebar-content">
+            <div class="analysis-list" id="analysisList">
+                <!-- 분석 결과 리스트가 여기에 동적으로 추가됩니다 -->
+            </div>
+            <div class="empty-state" id="emptyState">
+                <i class="fas fa-file-alt"></i>
+                <p>아직 분석 기록이 없습니다</p>
+                <span>첫 번째 분석을 시작해보세요!</span>
+            </div>
+        </div>
+        <div class="sidebar-footer">
+            <!-- 사이드바 하단 액션 버튼들 -->
+            <div class="sidebar-actions-bottom">
+                <button class="contact-btn" onclick="contactDeveloper()" title="개발자에게 문의">
+                    <i class="fas fa-comment-dots"></i>
+                </button>
+                <button class="delete-all-btn" onclick="deleteAllAnalysis()" title="모든 기록 삭제">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+            <!-- Clerk 인증 컴포넌트들 -->
+            <div id="clerk-auth-container"></div>
+        </div>
+    </aside>
+
+    <!-- 사이드바 토글 버튼 -->
+    <button class="sidebar-toggle-btn open" id="sidebarToggleBtn" onclick="toggleSidebar()">
+        <div class="layout-icon">
+            <div class="sidebar-indicator"></div>
+            <div class="content-indicator"></div>
+        </div>
+    </button>
+
+    <div class="container">
+        <!-- 메인 헤더 -->
+        <header class="main-header">
+            <div class="header-content">
+                <div class="header-badge">
+                    <i class="fas fa-sparkles"></i>
+                    <span>AI 기반 공시 분석 플랫폼</span>
+                </div>
+                <h1 class="main-title">
+                    <span class="title-gradient">AI와 함께</span>
+                    <span class="title-normal">전자공시를 분석하세요</span>
+                </h1>
+                <p class="main-description">
+                    복잡한 공시 내용을 빠르게 분석하세요.
+                </p>
+            </div>
+        </header>
+
+        <!-- 메인 컨텐츠 -->
+        <main class="main-content">
+                <!-- 파일 업로드 섹션 -->
+                <section class="upload-section">
+                    <div class="upload-card">
+                        <div class="upload-area" id="uploadArea">
+                            <div id="uploadDefault" class="upload-default">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <h3>PDF 파일을 업로드하세요</h3>
+                                <p>DART에서 다운로드한 공시 자료를 드래그 앤 드롭하거나 클릭하여 선택하세요</p>
+                                <input type="file" id="fileInput" accept=".pdf" hidden>
+                                <button class="upload-btn" onclick="triggerFileInput()">
+                                    파일 선택
+                                </button>
+                            </div>
+                            <div id="uploadInfo" class="upload-info" style="display: none;">
+                                <i class="fas fa-file-pdf"></i>
+                                <h3 id="fileName">파일명</h3>
+                                <p id="fileSize">파일 크기</p>
+                                <button class="change-file-btn" onclick="resetFileUpload()">
+                                    다른 파일 선택
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 공시 유형 선택 섹션 -->
+                <section class="disclosure-section" id="disclosureSection" style="display: none;">
+                    <div class="disclosure-card">
+                        <h3>공시 유형 선택</h3>
+                        <div class="disclosure-types">
+                            <div class="type-group">
+                                <label>공시 유형</label>
+                                <select id="disclosureType" onchange="updateSpecificTypes()">
+                                    <option value="">유형을 선택하세요</option>
+                                </select>
+                            </div>
+                            <div class="type-group">
+                                <label>세부 유형</label>
+                                <select id="specificType">
+                                    <option value="">세부 유형을 선택하세요</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="analyze-btn" id="analyzeBtn" onclick="analyzeDocument()" disabled>
+                            <i class="fas fa-magic"></i>
+                            분석 시작
+                        </button>
+                    </div>
+                </section>
+
+                <!-- 분석 결과 섹션 -->
+                <section class="result-section" id="resultSection" style="display: none;">
+                    <div class="result-card">
+                        <!-- 파일 정보 헤더 추가 -->
+                        <div class="file-info-header" id="fileInfoHeader">
+                            <div class="file-info-content">
+                                <div class="file-info-item">
+                                    <i class="fas fa-file-pdf"></i>
+                                    <span id="analysisFileName">파일명</span>
+                                </div>
+                                <div class="file-info-item">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span id="analysisDate">분석 날짜</span>
+                                </div>
+                                <div class="file-info-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span id="analysisTime">분석 시간</span>
+                                </div>
+                                <div class="file-info-item">
+                                    <i class="fas fa-tag"></i>
+                                    <span id="analysisType">분석 유형</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="result-header">
+                            <h3>분석 리포트</h3>
+                            <div class="result-actions">
+                                <button class="action-btn" onclick="copyResult()" title="결과를 클립보드에 복사">
+                                    <i class="fas fa-copy"></i>
+                                    복사
+                                </button>
+                                <button class="action-btn" onclick="downloadResult()" title="결과를 파일로 다운로드">
+                                    <i class="fas fa-download"></i>
+                                    다운로드
+                                </button>
+                            </div>
+                        </div>
+                        <div class="result-content" id="resultContent" role="region" aria-label="분석 결과">
+                            <!-- 분석 결과가 여기에 표시됩니다 -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 로딩 섹션 -->
+                <section class="loading-section" id="loadingSection" style="display: none;">
+                    <div class="loading-card">
+                        <div class="loading-content">
+                            <h3>문서를 분석하고 있습니다...</h3>
+                            <p>Dartify가 공시 내용을 분석하여 인사이트를 도출하고 있습니다.</p>
+                            
+                            <div class="loading-steps">
+                                <div class="step-item active" data-step="1">
+                                    <div class="step-icon">
+                                        <i class="fas fa-file-pdf"></i>
+                                        <div class="ripple-effect"></div>
+                                    </div>
+                                    <div class="step-text">
+                                        <span class="step-title">문서 읽기</span>
+                                        <span class="step-desc">PDF 내용 추출 중</span>
+                                    </div>
+                                </div>
+                                <div class="step-item" data-step="2">
+                                    <div class="step-icon">
+                                        <i class="fas fa-cogs"></i>
+                                        <div class="ripple-effect"></div>
+                                    </div>
+                                    <div class="step-text">
+                                        <span class="step-title">Dartify 분석</span>
+                                        <span class="step-desc">인사이트 도출 중</span>
+                                    </div>
+                                </div>
+                                <div class="step-item" data-step="3">
+                                    <div class="step-icon">
+                                        <i class="fas fa-chart-line"></i>
+                                        <div class="ripple-effect"></div>
+                                    </div>
+                                    <div class="step-text">
+                                        <span class="step-title">결과 생성</span>
+                                        <span class="step-desc">분석 결과 정리 중</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                            <div class="progress-text">
+                                <span class="progress-percentage">0%</span>
+                                <span class="progress-label">완료됨</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <!-- 푸터 -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-main">
+                    <p>&copy; 2025 Dartify. 투자자, 애널리스트, 기업 담당자를 위한 공시 분석 플랫폼</p>
+                </div>
+                <div class="footer-developer">
+                    <p>Developed by <a href="mailto:Jihwan1212@gmail.com">JiHwan</a></p>
+                    <p class="version">v1.0.0</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 연락처 팝업 -->
+    <div class="contact-popup" id="contactPopup">
+        <div class="contact-popup-overlay" onclick="closeContactPopup()"></div>
+        <div class="contact-popup-container">
+            <div class="contact-popup-header">
+                <h3>Contact Information</h3>
+                <button class="close-popup-btn" onclick="closeContactPopup()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="contact-popup-content">
+                <div class="contact-methods">
+                    <a href="mailto:Jihwan1212@gmail.com" class="contact-method" title="Gmail로 이메일 보내기">
+                        <i class="fas fa-envelope"></i>
+                        <span>Gmail</span>
+                    </a>
+                    <a href="https://github.com/Jihwan1212" target="_blank" class="contact-method" title="GitHub 프로필 보기">
+                        <i class="fab fa-github"></i>
+                        <span>GitHub</span>
+                    </a>
+                    <a href="https://linkedin.com/in/jihwan-yang-5a06032bb" target="_blank" class="contact-method" title="LinkedIn 프로필 보기">
+                        <i class="fab fa-linkedin"></i>
+                        <span>LinkedIn</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clerk 인증 스크립트 -->
+    <script
+        crossorigin="anonymous"
+        data-clerk-publishable-key="pk_test_dG91Z2gtb3N0cmljaC02Ni5jbGVyay5hY2NvdW50cy5kZXYk"
+        data-clerk-sign-in-url="/sign-in"
+        data-clerk-sign-up-url="/sign-up"
+        data-clerk-after-sign-in-url="/"
+        data-clerk-after-sign-up-url="/"
+        src="https://clerk.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js"
+        type="text/javascript"
+        onload="console.log('Clerk 스크립트 로드 완료'); window.clerkLoaded = true;"
+        onerror="console.error('Clerk 스크립트 로드 실패')"
+    ></script>
+    <script src="js/app.js"></script>
+</body>
+</html> 

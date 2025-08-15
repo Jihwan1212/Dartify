@@ -1,0 +1,36 @@
+{
+  "name": "dartify",
+  "version": "1.0.0",
+  "description": "**Dartify**는 기업의 전자공시(DART) 자료를 업로드하면 자동으로 분석하여 인사이트를 제공하는 공시 분석 자동화 플랫폼입니다.   투자자, 애널리스트, 기업 담당자 누구나 쉽고 빠르게 공시 내용을 이해하고 활용할 수 있도록 설계되었습니다.",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "test:prompt": "node test-prompt-api.js"
+  },
+  "keywords": [
+    "dart",
+    "공시",
+    "분석",
+    "ai",
+    "투자",
+    "fintech"
+  ],
+  "author": "Dartify Team",
+  "license": "ISC",
+  "dependencies": {
+    "@clerk/clerk-js": "^5.81.0",
+    "@supabase/supabase-js": "^2.38.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "marked": "^16.1.2",
+    "multer": "^1.4.5-lts.1",
+    "openai": "^5.12.0",
+    "pdf-parse": "^1.1.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
