@@ -1,7 +1,7 @@
 const { OpenAI } = require('openai');
 const pdf = require('pdf-parse');
 const fs = require('fs');
-const { supabase, getUserSupabase } = require('../config/supabase');
+const { supabase, getUserSpecificSupabase, validateUserAccess } = require('../config/supabase');
 const markdownService = require('../services/markdownService');
 const openaiService = require('../services/openaiService');
 const path = require('path');
@@ -159,84 +159,44 @@ const getAnalysisHistory = async (req, res) => {
         const clerkUser = req.headers['x-clerk-user'] ? JSON.parse(req.headers['x-clerk-user']) : null;
         console.log('👤 Clerk 사용자 정보:', clerkUser ? '존재함' : '없음');
         
-        if (!clerkUser || !clerkUser.id) {
-            console.error('❌ Clerk 사용자 ID 없음');
+        // 보안 검증
+        try {
+            validateUserAccess(clerkUser);
+        } catch (authError) {
+            console.error('❌ 인증 실패:', authError.message);
             return res.status(401).json({
                 success: false,
-                message: '로그인이 필요합니다.'
+                message: authError.message
             });
         }
 
         console.log('🔍 Supabase 쿼리 시작 - 사용자 ID:', clerkUser.id);
         
-        // 먼저 테이블 구조 확인
-        let { data, error } = await supabase
-            .from('analysis_results')
-            .select('*')
-            .limit(1);
-
-        if (error) {
-            console.error('❌ 테이블 구조 확인 실패:', error);
+        // 개선된 사용자별 데이터 접근 사용
+        const userSupabase = getUserSpecificSupabase(clerkUser);
+        if (!userSupabase) {
             return res.status(500).json({
                 success: false,
-                message: '데이터베이스 연결에 문제가 있습니다.',
-                error: error.message
+                message: '사용자 컨텍스트 설정에 실패했습니다.'
             });
         }
 
-        // user_id 컬럼이 있는지 확인
-        const hasUserIdColumn = data && data.length > 0 && 'user_id' in data[0];
-        console.log('📋 user_id 컬럼 존재 여부:', hasUserIdColumn);
-
-        if (hasUserIdColumn) {
-            // user_id 컬럼이 있는 경우 - 사용자별 필터링
-            const { data: userData, error: userError } = await supabase
-                .from('analysis_results')
-                .select('*')
-                .eq('user_id', clerkUser.id)
-                .order('created_at', { ascending: false })
-                .limit(50);
-
-            if (userError) {
-                console.error('❌ Supabase 쿼리 오류:', userError);
-                return res.status(500).json({
-                    success: false,
-                    message: '분석 기록을 불러올 수 없습니다.',
-                    error: userError.message
-                });
-            }
-
+        try {
+            // 사용자별 분석 기록 조회
+            const userData = await userSupabase.getUserData('analysis_results', {});
+            
             console.log('✅ 분석 기록 조회 성공 - 개수:', userData ? userData.length : 0);
             
             res.json({
                 success: true,
                 history: userData || []
             });
-        } else {
-            // user_id 컬럼이 없는 경우 - 모든 기록 가져오기 (임시 해결책)
-            console.log('⚠️ user_id 컬럼이 없어 모든 분석 기록을 가져옵니다.');
-            
-            const { data: allData, error: allError } = await supabase
-                .from('analysis_results')
-                .select('*')
-                .order('created_at', { ascending: false })
-                .limit(50);
-
-            if (allError) {
-                console.error('❌ Supabase 쿼리 오류:', allError);
-                return res.status(500).json({
-                    success: false,
-                    message: '분석 기록을 불러올 수 없습니다.',
-                    error: allError.message
-                });
-            }
-
-            console.log('✅ 모든 분석 기록 조회 성공 - 개수:', allData ? allData.length : 0);
-            
-            res.json({
-                success: true,
-                history: allData || [],
-                note: 'user_id 컬럼이 없어 모든 기록을 표시합니다.'
+        } catch (queryError) {
+            console.error('❌ 사용자 데이터 조회 실패:', queryError);
+            return res.status(500).json({
+                success: false,
+                message: '분석 기록을 불러올 수 없습니다.',
+                error: queryError.message
             });
         }
     } catch (error) {
@@ -272,69 +232,69 @@ const getAnalysisResult = async (req, res) => {
         console.log('👤 Clerk 사용자 정보:', clerkUser ? '존재함' : '없음');
         console.log('👤 Clerk 사용자 ID:', clerkUser?.id);
         
-        if (!clerkUser || !clerkUser.id) {
-            console.error('❌ Clerk 사용자 ID 없음');
+        // 보안 검증
+        try {
+            validateUserAccess(clerkUser);
+        } catch (authError) {
+            console.error('❌ 인증 실패:', authError.message);
             return res.status(401).json({
                 success: false,
-                message: '로그인이 필요합니다.'
+                message: authError.message
             });
         }
 
         console.log('🔍 Supabase 쿼리 시작 - ID:', id, '사용자 ID:', clerkUser.id);
         
-        // 먼저 해당 ID의 레코드가 존재하는지 확인 (사용자 필터링 없이)
-        const { data: allData, error: allError } = await supabase
-            .from('analysis_results')
-            .select('*')
-            .eq('id', id);
-
-        if (allError) {
-            console.error('❌ ID 존재 확인 실패:', allError);
+        // 사용자별 데이터 접근 사용
+        const userSupabase = getUserSpecificSupabase(clerkUser);
+        if (!userSupabase) {
             return res.status(500).json({
                 success: false,
-                message: '데이터베이스 조회 중 오류가 발생했습니다.',
-                error: allError.message
+                message: '사용자 컨텍스트 설정에 실패했습니다.'
             });
         }
 
-        console.log('📋 ID 존재 확인 결과:', allData ? allData.length : 0, '개 레코드');
-        
-        if (!allData || allData.length === 0) {
-            console.error('❌ 해당 ID의 분석 결과가 존재하지 않음:', id);
-            return res.status(404).json({
+        try {
+            // 사용자별로 해당 ID의 분석 결과 조회
+            const { data, error } = await userSupabase.supabase
+                .from('analysis_results')
+                .select('*')
+                .eq('id', id)
+                .eq('user_id', clerkUser.id)
+                .single();
+
+            if (error) {
+                console.error('❌ 분석 결과 조회 실패:', error);
+                return res.status(404).json({
+                    success: false,
+                    message: '해당 ID의 분석 결과를 찾을 수 없습니다.',
+                    requestedId: id
+                });
+            }
+
+            if (!data) {
+                console.error('❌ 해당 ID의 분석 결과가 존재하지 않음:', id);
+                return res.status(404).json({
+                    success: false,
+                    message: '해당 ID의 분석 결과를 찾을 수 없습니다.',
+                    requestedId: id
+                });
+            }
+
+            console.log('✅ 분석 결과 조회 성공');
+            
+            res.json({
+                success: true,
+                result: data
+            });
+        } catch (queryError) {
+            console.error('❌ 분석 결과 조회 실패:', queryError);
+            return res.status(500).json({
                 success: false,
-                message: '해당 ID의 분석 결과를 찾을 수 없습니다.',
-                requestedId: id
+                message: '분석 결과를 불러올 수 없습니다.',
+                error: queryError.message
             });
         }
-
-        const record = allData[0];
-        console.log('📋 찾은 레코드 정보:', {
-            id: record.id,
-            user_id: record.user_id,
-            filename: record.filename,
-            created_at: record.created_at
-        });
-
-        // user_id가 설정되어 있고, 현재 사용자와 다른 경우
-        if (record.user_id && record.user_id !== clerkUser.id) {
-            console.error('❌ 다른 사용자의 분석 결과에 접근 시도:', {
-                recordUserId: record.user_id,
-                currentUserId: clerkUser.id
-            });
-            return res.status(403).json({
-                success: false,
-                message: '다른 사용자의 분석 결과에 접근할 수 없습니다.'
-            });
-        }
-
-        // user_id가 설정되지 않은 경우 (기존 데이터) 또는 현재 사용자의 데이터인 경우
-        console.log('✅ 분석 결과 조회 성공');
-        
-        res.json({
-            success: true,
-            result: record
-        });
     } catch (error) {
         console.error('❌ getAnalysisResult 전체 오류:', error);
         console.error('❌ 오류 스택:', error.stack);
@@ -359,6 +319,17 @@ const deleteAnalysisResult = async (req, res) => {
         const { id } = req.params;
         const clerkUser = req.headers['x-clerk-user'] ? JSON.parse(req.headers['x-clerk-user']) : null;
         
+        // 보안 검증
+        try {
+            validateUserAccess(clerkUser);
+        } catch (authError) {
+            console.error('❌ 인증 실패:', authError.message);
+            return res.status(401).json({
+                success: false,
+                message: authError.message
+            });
+        }
+
         if (!clerkUser || !clerkUser.id) {
             return res.status(401).json({
                 success: false,
@@ -421,6 +392,17 @@ const deleteAllAnalysisResults = async (req, res) => {
 
         const clerkUser = req.headers['x-clerk-user'] ? JSON.parse(req.headers['x-clerk-user']) : null;
         
+        // 보안 검증
+        try {
+            validateUserAccess(clerkUser);
+        } catch (authError) {
+            console.error('❌ 인증 실패:', authError.message);
+            return res.status(401).json({
+                success: false,
+                message: authError.message
+            });
+        }
+
         if (!clerkUser || !clerkUser.id) {
             return res.status(401).json({
                 success: false,
