@@ -1829,6 +1829,9 @@ body {
     font-size: 0.9rem;
     margin: 0;
     line-height: 1.4;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .footer-developer a {
