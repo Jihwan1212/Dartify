@@ -16,5 +16,9 @@ COPY . .
 # 포트 노출
 EXPOSE 3000
 
+# Healthcheck 추가
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+  CMD curl -f http://localhost:3000/health || exit 1
+
 # 애플리케이션 시작
 CMD ["npm", "start"]

@@ -10,6 +10,12 @@ const configRoutes = require('./routes/configRoutes');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// 환경변수 확인 및 기본값 설정
+const corsOrigin = process.env.CORS_ORIGIN || '*';
+console.log('🚀 서버 시작 중...');
+console.log(`📊 포트: ${PORT}`);
+console.log(`🌐 CORS Origin: ${corsOrigin}`);
+
 // uploads 디렉토리 생성
 const fs = require('fs');
 const uploadsDir = path.join(__dirname, '../uploads');
@@ -20,7 +26,7 @@ if (!fs.existsSync(uploadsDir)) {
 
 // 미들웨어 설정
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3001',
+  origin: corsOrigin,
   credentials: true
 }));
 
@@ -33,6 +39,15 @@ app.use(express.static(path.join(__dirname, '../public')));
 // API 라우트
 app.use('/api/analysis', analysisRoutes);
 app.use('/api/config', configRoutes);
+
+// Healthcheck 엔드포인트
+app.get('/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'OK', 
+    message: 'Dartify 서버가 정상적으로 실행 중입니다.',
+    timestamp: new Date().toISOString()
+  });
+});
 
 // 기본 라우트
 app.get('/', (req, res) => {
