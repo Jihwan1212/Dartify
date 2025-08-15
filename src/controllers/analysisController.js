@@ -143,22 +143,32 @@ const getDisclosureTypes = async (req, res) => {
 // 분석 기록 가져오기
 const getAnalysisHistory = async (req, res) => {
     try {
+        console.log('🔍 getAnalysisHistory 호출됨');
+        console.log('📋 요청 헤더:', req.headers);
+        
         if (!supabase) {
+            console.error('❌ Supabase가 설정되지 않음');
             return res.status(500).json({
                 success: false,
                 message: 'Supabase가 설정되지 않아 분석 기록을 불러올 수 없습니다.'
             });
         }
 
+        console.log('✅ Supabase 연결 확인됨');
+        
         const clerkUser = req.headers['x-clerk-user'] ? JSON.parse(req.headers['x-clerk-user']) : null;
+        console.log('👤 Clerk 사용자 정보:', clerkUser ? '존재함' : '없음');
         
         if (!clerkUser || !clerkUser.id) {
+            console.error('❌ Clerk 사용자 ID 없음');
             return res.status(401).json({
                 success: false,
                 message: '로그인이 필요합니다.'
             });
         }
 
+        console.log('🔍 Supabase 쿼리 시작 - 사용자 ID:', clerkUser.id);
+        
         // 사용자별로 분석 결과를 필터링하여 가져옴
         const { data, error } = await supabase
             .from('analysis_results')
@@ -168,22 +178,27 @@ const getAnalysisHistory = async (req, res) => {
             .limit(50);
 
         if (error) {
-            console.error('분석 기록 조회 오류:', error);
+            console.error('❌ Supabase 쿼리 오류:', error);
             return res.status(500).json({
                 success: false,
-                message: '분석 기록을 불러올 수 없습니다.'
+                message: '분석 기록을 불러올 수 없습니다.',
+                error: error.message
             });
         }
 
+        console.log('✅ 분석 기록 조회 성공 - 개수:', data ? data.length : 0);
+        
         res.json({
             success: true,
             history: data || []
         });
     } catch (error) {
-        console.error('분석 기록 조회 중 오류:', error);
+        console.error('❌ getAnalysisHistory 전체 오류:', error);
+        console.error('❌ 오류 스택:', error.stack);
         res.status(500).json({
             success: false,
-            message: '분석 기록을 불러올 수 없습니다.'
+            message: '분석 기록을 불러올 수 없습니다.',
+            error: error.message
         });
     }
 };

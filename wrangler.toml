@@ -1,0 +1,17 @@
+name = "dartify"
+main = "src/worker.js"
+compatibility_date = "2024-01-01"
+
+[env.production]
+name = "dartify-production"
+
+[env.staging]
+name = "dartify-staging"
+
+[[env.production.vars]]
+name = "NODE_ENV"
+value = "production"
+
+[[env.staging.vars]]
+name = "NODE_ENV"
+value = "staging"
