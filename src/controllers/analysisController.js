@@ -253,7 +253,12 @@ const getAnalysisHistory = async (req, res) => {
 // 특정 분석 결과 가져오기
 const getAnalysisResult = async (req, res) => {
     try {
+        console.log('🔍 getAnalysisResult 호출됨');
+        console.log('📋 요청 파라미터:', req.params);
+        console.log('📋 요청 헤더:', req.headers);
+        
         if (!supabase) {
+            console.error('❌ Supabase가 설정되지 않음');
             return res.status(500).json({
                 success: false,
                 message: 'Supabase가 설정되지 않아 분석 결과를 불러올 수 없습니다.'
@@ -261,40 +266,82 @@ const getAnalysisResult = async (req, res) => {
         }
 
         const { id } = req.params;
+        console.log('🔍 요청된 분석 ID:', id);
+        
         const clerkUser = req.headers['x-clerk-user'] ? JSON.parse(req.headers['x-clerk-user']) : null;
+        console.log('👤 Clerk 사용자 정보:', clerkUser ? '존재함' : '없음');
+        console.log('👤 Clerk 사용자 ID:', clerkUser?.id);
         
         if (!clerkUser || !clerkUser.id) {
+            console.error('❌ Clerk 사용자 ID 없음');
             return res.status(401).json({
                 success: false,
                 message: '로그인이 필요합니다.'
             });
         }
+
+        console.log('🔍 Supabase 쿼리 시작 - ID:', id, '사용자 ID:', clerkUser.id);
         
-        // 사용자별로 분석 결과를 필터링하여 조회
-        const { data, error } = await supabase
+        // 먼저 해당 ID의 레코드가 존재하는지 확인 (사용자 필터링 없이)
+        const { data: allData, error: allError } = await supabase
             .from('analysis_results')
             .select('*')
-            .eq('id', id)
-            .eq('user_id', clerkUser.id)
-            .single();
+            .eq('id', id);
 
-        if (error) {
-            console.error('분석 결과 조회 오류:', error);
-            return res.status(404).json({
+        if (allError) {
+            console.error('❌ ID 존재 확인 실패:', allError);
+            return res.status(500).json({
                 success: false,
-                message: '분석 결과를 찾을 수 없습니다.'
+                message: '데이터베이스 조회 중 오류가 발생했습니다.',
+                error: allError.message
             });
         }
 
+        console.log('📋 ID 존재 확인 결과:', allData ? allData.length : 0, '개 레코드');
+        
+        if (!allData || allData.length === 0) {
+            console.error('❌ 해당 ID의 분석 결과가 존재하지 않음:', id);
+            return res.status(404).json({
+                success: false,
+                message: '해당 ID의 분석 결과를 찾을 수 없습니다.',
+                requestedId: id
+            });
+        }
+
+        const record = allData[0];
+        console.log('📋 찾은 레코드 정보:', {
+            id: record.id,
+            user_id: record.user_id,
+            filename: record.filename,
+            created_at: record.created_at
+        });
+
+        // user_id가 설정되어 있고, 현재 사용자와 다른 경우
+        if (record.user_id && record.user_id !== clerkUser.id) {
+            console.error('❌ 다른 사용자의 분석 결과에 접근 시도:', {
+                recordUserId: record.user_id,
+                currentUserId: clerkUser.id
+            });
+            return res.status(403).json({
+                success: false,
+                message: '다른 사용자의 분석 결과에 접근할 수 없습니다.'
+            });
+        }
+
+        // user_id가 설정되지 않은 경우 (기존 데이터) 또는 현재 사용자의 데이터인 경우
+        console.log('✅ 분석 결과 조회 성공');
+        
         res.json({
             success: true,
-            result: data
+            result: record
         });
     } catch (error) {
-        console.error('분석 결과 조회 중 오류:', error);
+        console.error('❌ getAnalysisResult 전체 오류:', error);
+        console.error('❌ 오류 스택:', error.stack);
         res.status(500).json({
             success: false,
-            message: '분석 결과를 불러올 수 없습니다.'
+            message: '분석 결과를 불러올 수 없습니다.',
+            error: error.message
         });
     }
 };
