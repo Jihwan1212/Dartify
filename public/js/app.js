@@ -41,8 +41,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     loadDisclosureTypes();
     setupEventListeners();
     
-    // 분석 기록 로드
-    loadAnalysisHistory();
+    // 분석 기록 로드는 인증 상태 확인 후에만 실행
+    // loadAnalysisHistory()는 checkAuthAndUpdateUI()에서 처리됨
 });
 
 // 인증 상태 확인 및 UI 업데이트
@@ -50,9 +50,14 @@ function checkAuthAndUpdateUI() {
     if (window.clerk && window.clerk.isSignedIn) {
         // 로그인된 사용자 - 서비스 화면 표시
         showServiceContent();
+        // 로그인된 사용자의 분석 기록 로드
+        loadAnalysisHistory();
     } else {
         // 로그인되지 않은 사용자 - 메인 콘텐츠는 표시하되 로그인 요청 화면은 숨김
         showMainContentWithoutLoginScreen();
+        // 로그인되지 않은 사용자는 분석 기록 초기화
+        analysisHistory = [];
+        renderAnalysisHistory();
     }
 }
 
@@ -350,6 +355,9 @@ async function initializeClerk() {
             // 이미 표시된 로그인 버튼을 그대로 유지
         }
         
+        // Clerk 초기화 완료 후 인증 상태 확인 및 UI 업데이트
+        checkAuthAndUpdateUI();
+        
         // 인증 상태 변경 리스너 추가
         clerk.addListener(({ user }) => {
             console.log('인증 상태 변경:', user ? '로그인' : '로그아웃');
@@ -362,6 +370,15 @@ async function initializeClerk() {
                 setTimeout(() => {
                     goBackToMain();
                 }, 500); // 0.5초 후 모달 닫기
+                // 로그인 시 분석 기록 로드
+                loadAnalysisHistory();
+            } else {
+                // 로그아웃 시 분석 기록 초기화
+                analysisHistory = [];
+                renderAnalysisHistory();
+                // 결과 섹션도 숨기기
+                resultSection.style.display = 'none';
+                currentAnalysisId = null;
             }
         });
         
@@ -1459,6 +1476,14 @@ function toggleSidebar() {
 
 // 분석 기록 로드
 async function loadAnalysisHistory() {
+    // 로그인 상태 확인
+    if (!window.clerk || !window.clerk.isSignedIn) {
+        console.log('로그인되지 않은 사용자 - 분석 기록 로드 건너뜀');
+        analysisHistory = [];
+        renderAnalysisHistory();
+        return;
+    }
+    
     try {
         const response = await fetch('/api/analysis/history', {
             headers: {
@@ -1475,6 +1500,9 @@ async function loadAnalysisHistory() {
         }
     } catch (error) {
         console.error('분석 기록 로드 실패:', error);
+        // 오류 발생 시 빈 배열로 초기화
+        analysisHistory = [];
+        renderAnalysisHistory();
     }
 }
 

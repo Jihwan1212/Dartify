@@ -87,8 +87,9 @@ const analyzeDocument = async (req, res) => {
                         specific_type: specificType,
                         analysis_result: analysisResult,
                         file_size: file.size,
-                        pages: pdfData.numpages || 1
-                        // user_id와 user_email 컬럼이 현재 테이블에 없으므로 제거
+                        pages: pdfData.numpages || 1,
+                        user_id: clerkUser?.id || null,
+                        user_email: clerkUser?.emailAddresses?.[0]?.emailAddress || null
                     });
 
                 if (error) {
@@ -149,10 +150,20 @@ const getAnalysisHistory = async (req, res) => {
             });
         }
 
-        // 현재 테이블 구조에서는 user_id 컬럼이 없으므로 모든 분석 결과를 가져옴
+        const clerkUser = req.headers['x-clerk-user'] ? JSON.parse(req.headers['x-clerk-user']) : null;
+        
+        if (!clerkUser || !clerkUser.id) {
+            return res.status(401).json({
+                success: false,
+                message: '로그인이 필요합니다.'
+            });
+        }
+
+        // 사용자별로 분석 결과를 필터링하여 가져옴
         const { data, error } = await supabase
             .from('analysis_results')
             .select('*')
+            .eq('user_id', clerkUser.id)
             .order('created_at', { ascending: false })
             .limit(50);
 
@@ -188,12 +199,21 @@ const getAnalysisResult = async (req, res) => {
         }
 
         const { id } = req.params;
+        const clerkUser = req.headers['x-clerk-user'] ? JSON.parse(req.headers['x-clerk-user']) : null;
         
-        // 현재 테이블 구조에서는 user_id 컬럼이 없으므로 ID만으로 조회
+        if (!clerkUser || !clerkUser.id) {
+            return res.status(401).json({
+                success: false,
+                message: '로그인이 필요합니다.'
+            });
+        }
+        
+        // 사용자별로 분석 결과를 필터링하여 조회
         const { data, error } = await supabase
             .from('analysis_results')
             .select('*')
             .eq('id', id)
+            .eq('user_id', clerkUser.id)
             .single();
 
         if (error) {
@@ -228,12 +248,21 @@ const deleteAnalysisResult = async (req, res) => {
         }
 
         const { id } = req.params;
+        const clerkUser = req.headers['x-clerk-user'] ? JSON.parse(req.headers['x-clerk-user']) : null;
         
-        // 분석 결과가 존재하는지 먼저 확인
+        if (!clerkUser || !clerkUser.id) {
+            return res.status(401).json({
+                success: false,
+                message: '로그인이 필요합니다.'
+            });
+        }
+        
+        // 사용자별로 분석 결과가 존재하는지 먼저 확인
         const { data: existingData, error: checkError } = await supabase
             .from('analysis_results')
             .select('id')
             .eq('id', id)
+            .eq('user_id', clerkUser.id)
             .single();
 
         if (checkError || !existingData) {
@@ -247,7 +276,8 @@ const deleteAnalysisResult = async (req, res) => {
         const { error: deleteError } = await supabase
             .from('analysis_results')
             .delete()
-            .eq('id', id);
+            .eq('id', id)
+            .eq('user_id', clerkUser.id);
 
         if (deleteError) {
             console.error('분석 기록 삭제 오류:', deleteError);
@@ -280,10 +310,20 @@ const deleteAllAnalysisResults = async (req, res) => {
             });
         }
 
-        // 먼저 모든 분석 결과를 조회
+        const clerkUser = req.headers['x-clerk-user'] ? JSON.parse(req.headers['x-clerk-user']) : null;
+        
+        if (!clerkUser || !clerkUser.id) {
+            return res.status(401).json({
+                success: false,
+                message: '로그인이 필요합니다.'
+            });
+        }
+
+        // 먼저 해당 사용자의 모든 분석 결과를 조회
         const { data: existingData, error: checkError } = await supabase
             .from('analysis_results')
-            .select('id');
+            .select('id')
+            .eq('user_id', clerkUser.id);
 
         if (checkError) {
             console.error('분석 기록 조회 오류:', checkError);
@@ -301,11 +341,11 @@ const deleteAllAnalysisResults = async (req, res) => {
             });
         }
 
-        // 모든 분석 결과 삭제 (더 안전한 방법)
+        // 해당 사용자의 모든 분석 결과 삭제
         const { error: deleteError } = await supabase
             .from('analysis_results')
             .delete()
-            .gte('id', 0); // 모든 ID가 0 이상이므로 모든 레코드 삭제
+            .eq('user_id', clerkUser.id);
 
         if (deleteError) {
             console.error('모든 분석 기록 삭제 오류:', deleteError);
