@@ -79,6 +79,12 @@ const analyzeDocument = async (req, res) => {
             try {
                 const clerkUser = req.headers['x-clerk-user'] ? JSON.parse(req.headers['x-clerk-user']) : null;
                 
+                console.log('🔍 분석 저장 - Clerk 사용자 정보:', {
+                    hasUser: !!clerkUser,
+                    userId: clerkUser?.id,
+                    userEmail: clerkUser?.emailAddresses?.[0]?.emailAddress
+                });
+                
                 const { data, error } = await supabase
                     .from('analysis_results')
                     .insert({
@@ -88,17 +94,16 @@ const analyzeDocument = async (req, res) => {
                         analysis_result: analysisResult,
                         file_size: file.size,
                         pages: pdfData.numpages || 1,
-                        user_id: clerkUser?.id || null,
-                        user_email: clerkUser?.emailAddresses?.[0]?.emailAddress || null
+                        user_id: clerkUser?.id || null
                     });
 
                 if (error) {
-                    console.error('Supabase 저장 오류:', error);
+                    console.error('❌ Supabase 저장 오류:', error);
                 } else {
-                    console.log('✅ 분석 결과가 Supabase에 저장되었습니다.');
+                    console.log('✅ 분석 결과가 Supabase에 저장되었습니다. ID:', data?.[0]?.id);
                 }
             } catch (dbError) {
-                console.error('Supabase 저장 중 오류:', dbError);
+                console.error('❌ Supabase 저장 중 오류:', dbError);
             }
         }
 

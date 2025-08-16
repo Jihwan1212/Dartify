@@ -1548,11 +1548,8 @@ function renderAnalysisHistory() {
                 displayFilename = displayFilename;
             }
             
-            // 특수문자 제거 및 안전한 파일명으로 변환
-            displayFilename = displayFilename
-                .replace(/[^\w\s가-힣.-]/g, '') // 한글, 영문, 숫자, 공백, 점, 하이픈만 허용
-                .replace(/\s+/g, ' ') // 연속된 공백을 하나로
-                .trim();
+            // 원본 파일명을 그대로 사용 (특수문자 제거하지 않음)
+            displayFilename = displayFilename.trim();
         }
         
         // 파일명이 비어있거나 너무 짧은 경우 기본값 사용
@@ -1927,11 +1924,8 @@ function displayAnalysisResult(result) {
             displayFilename = displayFilename;
         }
         
-        // 특수문자 제거 및 안전한 파일명으로 변환
-        displayFilename = displayFilename
-            .replace(/[^\w\s가-힣.-]/g, '') // 한글, 영문, 숫자, 공백, 점, 하이픈만 허용
-            .replace(/\s+/g, ' ') // 연속된 공백을 하나로
-            .trim();
+        // 원본 파일명을 그대로 사용 (특수문자 제거하지 않음)
+        displayFilename = displayFilename.trim();
     }
     
     // 파일명이 비어있거나 너무 짧은 경우 기본값 사용

@@ -44,7 +44,7 @@ body {
 }
 
 .logo-text {
-    font-size: 1.8rem;
+    font-size: 2.2rem; /* 1.8rem에서 2.2rem으로 증가 */
     font-weight: 900;
     color: #667eea;
     letter-spacing: -0.5px;
@@ -171,7 +171,7 @@ body {
     position: fixed;
     left: 0; /* 기본적으로 열린 상태 */
     top: 0;
-    width: 320px;
+    width: 380px; /* 320px에서 380px로 증가 */
     height: 100vh;
     background: white;
     border-right: 1px solid #f0f0f0;
@@ -184,7 +184,7 @@ body {
 }
 
 .analysis-sidebar.closed {
-    left: -320px; /* 닫힌 상태 */
+    left: -380px; /* 닫힌 상태 - 너비에 맞춰 수정 */
 }
 
 /* 사이드바가 닫혔을 때 토글 버튼 위치 조정 */
@@ -194,19 +194,19 @@ body {
 
 /* 메인 컨테이너 조정 */
 .container {
-    margin-left: 320px; /* 항상 고정된 여백 */
+    margin-left: 380px; /* 사이드바 너비에 맞춰 조정 */
     transition: margin-left 0.3s ease;
 }
 
 /* 사이드바가 닫혀도 메인 컨테이너는 그대로 유지 */
 .analysis-sidebar.closed ~ .container {
-    margin-left: 320px; /* 닫혀도 여백 유지 */
+    margin-left: 380px; /* 닫혀도 여백 유지 */
 }
 
 /* 사이드바 토글 버튼 */
 .sidebar-toggle-btn {
     position: fixed;
-    left: 340px; /* 사이드바가 열린 상태의 기본 위치 */
+    left: 400px; /* 사이드바가 열린 상태의 기본 위치 - 너비에 맞춰 조정 */
     top: 20px;
     width: 40px;
     height: 40px;
@@ -278,7 +278,7 @@ body {
 
 /* 사이드바가 열렸을 때 토글 버튼 위치 조정 */
 .analysis-sidebar.open + .sidebar-toggle-btn {
-    left: 340px;
+    left: 400px;
 }
 
 /* 메인 컨테이너 조정 */
@@ -288,7 +288,7 @@ body {
 }
 
 .analysis-sidebar.open ~ .container {
-    margin-left: 320px;
+    margin-left: 380px;
 }
 
 /* 사이드바 헤더 */
@@ -325,7 +325,7 @@ body {
 }
 
 .sidebar-logo .logo-text {
-    font-size: 1.4rem;
+    font-size: 1.8rem; /* 1.4rem에서 1.8rem으로 증가 */
     font-weight: 900;
     color: #667eea;
     letter-spacing: -0.5px;
@@ -494,9 +494,11 @@ body {
     transition: all 0.3s ease;
     position: relative;
     display: flex;
-    align-items: center;
+    align-items: flex-start; /* 상단 정렬로 변경 */
     justify-content: space-between;
     gap: 10px;
+    overflow: hidden; /* 카드 밖으로 내용이 넘치지 않도록 */
+    min-height: 80px; /* 최소 높이 설정 */
 }
 
 .analysis-item:hover {
@@ -515,13 +517,17 @@ body {
 .analysis-item-content {
     flex: 1;
     cursor: pointer;
+    min-width: 0; /* flex 아이템이 축소될 수 있도록 */
+    overflow: hidden; /* 내용이 넘치지 않도록 */
 }
 
 .analysis-item-actions {
-    display: flex;
-    align-items: center;
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
     opacity: 0;
     transition: opacity 0.3s ease;
+    z-index: 10;
 }
 
 .analysis-item:hover .analysis-item-actions {
@@ -529,17 +535,21 @@ body {
 }
 
 .delete-btn {
-    background: none;
-    border: none;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(108, 117, 125, 0.2);
     color: #6c757d;
     cursor: pointer;
-    padding: 8px;
-    border-radius: 6px;
+    padding: 6px;
+    border-radius: 50%;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
+    width: 28px;
+    height: 28px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .delete-btn:hover {
@@ -563,9 +573,11 @@ body {
 
 .analysis-item-header {
     display: flex;
-    align-items: center;
+    align-items: flex-start; /* 상단 정렬로 변경 */
     gap: 10px;
     margin-bottom: 8px;
+    flex: 1; /* 남은 공간을 모두 차지 */
+    min-width: 0; /* flex 아이템이 축소될 수 있도록 */
 }
 
 .analysis-item-icon {
@@ -593,6 +605,8 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    max-width: 100%; /* 카드 너비를 넘지 않도록 제한 */
+    word-wrap: break-word; /* 긴 단어도 줄바꿈 */
 }
 
 .analysis-item-meta {
@@ -650,8 +664,8 @@ body {
 
 /* 메인 콘텐츠 영역 조정 */
 .container {
-    margin-left: 320px;
-    max-width: calc(100vw - 320px);
+    margin-left: 380px;
+    max-width: calc(100vw - 380px);
 }
 
 /* 메인 헤더 스타일 */
@@ -1801,9 +1815,11 @@ body {
 
 .footer-content {
     display: flex;
-    flex-direction: column;
-    gap: 15px;
+    flex-direction: row;
+    gap: 20px;
     align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 .footer-main p {
@@ -1815,13 +1831,13 @@ body {
 
 .footer-developer {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 8px;
     align-items: center;
-    padding-top: 15px;
-    border-top: 1px solid #f0f0f0;
-    width: 100%;
-    max-width: 400px;
+    padding-top: 0;
+    border-top: none;
+    width: auto;
+    max-width: none;
 }
 
 .footer-developer p {
@@ -2802,8 +2818,8 @@ body {
 /* 반응형 디자인 */
 @media (max-width: 768px) {
     .analysis-sidebar {
-        width: 280px;
-        left: -280px; /* 모바일에서는 기본적으로 닫힌 상태 */
+        width: 320px; /* 모바일에서도 너비 증가 */
+        left: -320px; /* 모바일에서는 기본적으로 닫힌 상태 */
     }
     
     .analysis-sidebar.open {
@@ -2818,7 +2834,7 @@ body {
     }
     
     .analysis-sidebar.open + .sidebar-toggle-btn {
-        left: 295px;
+        left: 335px; /* 모바일에서도 위치 조정 */
     }
     
     .analysis-sidebar.open ~ .container {

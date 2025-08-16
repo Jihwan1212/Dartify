@@ -76,7 +76,8 @@ const getUserSpecificSupabase = (clerkUser) => {
           .from(tableName)
           .select('*')
           .eq('user_id', context.userContext.id)
-          .match(additionalFilters);
+          .match(additionalFilters)
+          .order('created_at', { ascending: false }); // 최신 데이터부터 정렬
           
         if (error) {
           console.error(`❌ ${tableName} 조회 오류:`, error);
