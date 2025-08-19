@@ -296,7 +296,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px;
+    padding: 20px 20px 20px 10px;
     border-bottom: 1px solid #f0f0f0;
     background: #fafafa;
 }
@@ -309,8 +309,10 @@ body {
 .sidebar-logo {
     display: flex;
     align-items: center;
+    justify-content: flex-start;
     transition: all 0.3s ease;
-    padding: 8px 12px;
+    padding: 8px 8px 8px 0px;
+    margin-left: -10px;
     border-radius: 8px;
     cursor: pointer;
 }
@@ -324,16 +326,31 @@ body {
     transform: translateY(0);
 }
 
+/* 텍스트 로고 스타일 (이미지 로고로 대체됨) */
 .sidebar-logo .logo-text {
-    font-size: 1.8rem; /* 1.4rem에서 1.8rem으로 증가 */
+    font-size: 1.8rem;
     font-weight: 900;
     color: #667eea;
     letter-spacing: -0.5px;
     transition: all 0.3s ease;
+    display: none; /* 이미지 로고 사용으로 숨김 */
 }
 
 .sidebar-logo:hover .logo-text {
     color: #5a6fd8;
+}
+
+.sidebar-logo .logo-image {
+    height: 60px;
+    width: auto;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    max-width: 220px;
+}
+
+.sidebar-logo:hover .logo-image {
+    transform: scale(1.05);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
 }
 
 .sidebar-header h3 {
