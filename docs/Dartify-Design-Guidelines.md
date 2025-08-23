@@ -29,6 +29,7 @@ Dartify는 기업의 전자공시(DART) 자료를 AI 기반으로 분석하여 �
 - **Primary Blue**: `#667eea`
   - 사용: 주요 버튼, 브랜드 로고, 강조 요소
   - 의미: 신뢰, 안정, 전문성
+  - 그라데이션 효과: 45도, #667eea → #764ba2
 
 #### Secondary Colors
 - **Light Blue**: `#f8f9ff`

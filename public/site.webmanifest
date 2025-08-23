@@ -1,0 +1,21 @@
+{
+    "name": "Dartify - 공시 분석 자동화 플랫폼",
+    "short_name": "Dartify",
+    "description": "AI 기반 전자공시 분석 플랫폼",
+    "icons": [
+        {
+            "src": "images/dartify_logo.png",
+            "sizes": "399x399",
+            "type": "image/png"
+        },
+        {
+            "src": "images/dartify_logo.svg",
+            "sizes": "any",
+            "type": "image/svg+xml"
+        }
+    ],
+    "theme_color": "#667eea",
+    "background_color": "#ffffff",
+    "display": "standalone",
+    "start_url": "/"
+}
