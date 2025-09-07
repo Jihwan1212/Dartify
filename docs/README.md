@@ -89,7 +89,7 @@ NODE_ENV=development
 
 # OpenAI API
 OPENAI_API_KEY=your_openai_api_key_here
-OPENAI_PROMPT_ID=pmpt_689321d3b5e48196bb2cf970663b1bd208796189d84781fd
+OPENAI_PROMPT_ID=OPENAI_PROMPT_ID_here
 
 # Clerk Authentication
 CLERK_PUBLISHABLE_KEY=pk_test_your_clerk_publishable_key_here
