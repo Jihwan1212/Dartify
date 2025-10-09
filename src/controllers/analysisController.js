@@ -27,10 +27,11 @@ const analyzeDocument = async (req, res) => {
             return res.status(400).json({ error: '공시 유형을 선택해주세요.' });
         }
 
-        tempFilePath = file.path;
+        // 운영체제에 상관없이 올바른 경로 처리
+        tempFilePath = path.normalize(file.path);
 
         // PDF 파일 읽기
-        const dataBuffer = fs.readFileSync(file.path);
+        const dataBuffer = fs.readFileSync(tempFilePath);
         const pdfData = await pdf(dataBuffer);
 
         // 텍스트 길이 검증
@@ -118,12 +119,22 @@ const analyzeDocument = async (req, res) => {
             error: error.message || '문서 분석 중 오류가 발생했습니다.'
         });
     } finally {
-        // 임시 파일 정리
+        // 임시 파일 정리 (운영체제별 안전한 처리)
         if (tempFilePath && fs.existsSync(tempFilePath)) {
             try {
-                fs.unlinkSync(tempFilePath);
+                // Windows에서는 파일이 잠겨있을 수 있으므로 약간의 지연 후 삭제 시도
+                setTimeout(() => {
+                    try {
+                        if (fs.existsSync(tempFilePath)) {
+                            fs.unlinkSync(tempFilePath);
+                            console.log('✅ 임시 파일 삭제 완료:', tempFilePath);
+                        }
+                    } catch (delayedError) {
+                        console.error('⚠️ 임시 파일 지연 삭제 실패:', delayedError.message);
+                    }
+                }, 100);
             } catch (cleanupError) {
-                console.error('임시 파일 삭제 중 오류:', cleanupError);
+                console.error('⚠️ 임시 파일 삭제 중 오류:', cleanupError.message);
             }
         }
     }

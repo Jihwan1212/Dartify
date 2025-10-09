@@ -17,18 +17,21 @@ class SimplePDFService {
 
   async parsePDF(filePath) {
     try {
+      // 운영체제에 상관없이 올바른 경로 처리
+      const normalizedPath = path.normalize(filePath);
+      
       // 파일 존재 확인
-      if (!fs.existsSync(filePath)) {
+      if (!fs.existsSync(normalizedPath)) {
         throw new Error('PDF 파일을 찾을 수 없습니다.');
       }
 
       // 기본 텍스트 추출만 사용 (OCR 비활성화)
-      let extractedText = await this.extractBasicText(filePath);
+      let extractedText = await this.extractBasicText(normalizedPath);
       
       // 텍스트가 부족한 경우에만 OCR 시도 (설정에 따라)
       if ((!extractedText || extractedText.trim().length < 100) && this.ocrEnabled) {
         console.log('기본 텍스트 추출 실패, OCR 시도 중...');
-        extractedText = await this.extractTextWithOCR(filePath);
+        extractedText = await this.extractTextWithOCR(normalizedPath);
       }
 
       // 텍스트 길이 제한 적용
@@ -37,7 +40,7 @@ class SimplePDFService {
       }
 
       // 메타데이터 추출 (최소화)
-      const metadata = await this.extractBasicMetadata(filePath);
+      const metadata = await this.extractBasicMetadata(normalizedPath);
 
       // 최종 검증
       if (!extractedText || extractedText.trim().length < 50) {
@@ -191,16 +194,49 @@ class SimplePDFService {
     return new Error('PDF 파일을 읽을 수 없습니다. 파일이 손상되었거나 지원되지 않는 형식일 수 있습니다.');
   }
 
-  // 임시 파일 정리
+  // 임시 파일 정리 (운영체제별 안전한 처리)
   cleanupTempFiles() {
     try {
+      if (!fs.existsSync(this.tempDir)) {
+        return;
+      }
+      
       const files = fs.readdirSync(this.tempDir);
+      let cleanedCount = 0;
+      let failedCount = 0;
+      
       files.forEach(file => {
-        const filePath = path.join(this.tempDir, file);
-        fs.unlinkSync(filePath);
+        try {
+          const filePath = path.join(this.tempDir, file);
+          const stats = fs.statSync(filePath);
+          
+          // 디렉토리는 건너뛰기
+          if (stats.isDirectory()) {
+            return;
+          }
+          
+          // 24시간 이상 된 파일만 삭제
+          const fileAge = Date.now() - stats.mtimeMs;
+          const oneDayInMs = 24 * 60 * 60 * 1000;
+          
+          if (fileAge > oneDayInMs) {
+            fs.unlinkSync(filePath);
+            cleanedCount++;
+          }
+        } catch (fileError) {
+          failedCount++;
+          console.error('파일 삭제 실패:', file, fileError.message);
+        }
       });
+      
+      if (cleanedCount > 0) {
+        console.log(`✅ ${cleanedCount}개의 임시 파일 정리 완료`);
+      }
+      if (failedCount > 0) {
+        console.warn(`⚠️ ${failedCount}개의 파일 삭제 실패`);
+      }
     } catch (error) {
-      console.error('임시 파일 정리 실패:', error);
+      console.error('⚠️ 임시 파일 정리 실패:', error.message);
     }
   }
 }

@@ -10,12 +10,28 @@ const configRoutes = require('./routes/configRoutes');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// uploads 디렉토리 생성
+// uploads 디렉토리 생성 (운영체제별 안전한 처리)
 const fs = require('fs');
 const uploadsDir = path.join(__dirname, '../uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-  console.log('✅ uploads 디렉토리가 생성되었습니다.');
+try {
+  if (!fs.existsSync(uploadsDir)) {
+    // recursive: true로 중간 디렉토리도 생성
+    fs.mkdirSync(uploadsDir, { recursive: true, mode: 0o755 });
+    console.log('✅ uploads 디렉토리가 생성되었습니다:', uploadsDir);
+  } else {
+    console.log('✅ uploads 디렉토리가 이미 존재합니다:', uploadsDir);
+  }
+  
+  // 디렉토리 쓰기 권한 확인 (Windows에서는 무시될 수 있음)
+  try {
+    fs.accessSync(uploadsDir, fs.constants.W_OK);
+    console.log('✅ uploads 디렉토리 쓰기 권한 확인 완료');
+  } catch (accessError) {
+    console.warn('⚠️ uploads 디렉토리 쓰기 권한 없음. Windows에서는 무시될 수 있습니다.');
+  }
+} catch (error) {
+  console.error('❌ uploads 디렉토리 생성 실패:', error.message);
+  console.error('⚠️ 파일 업로드가 작동하지 않을 수 있습니다.');
 }
 
 // 미들웨어 설정
