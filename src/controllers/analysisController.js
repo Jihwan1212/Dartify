@@ -78,8 +78,13 @@ const analyzeDocument = async (req, res) => {
         // Supabase에 저장
         if (supabase) {
             try {
-                const clerkUser = req.headers['x-clerk-user'] ? JSON.parse(req.headers['x-clerk-user']) : null;
-                
+                let clerkUser = null;
+                try {
+                    clerkUser = req.headers['x-clerk-user'] ? JSON.parse(req.headers['x-clerk-user']) : null;
+                } catch (parseError) {
+                    console.error('❌ x-clerk-user 헤더 파싱 실패:', parseError.message);
+                }
+
                 console.log('🔍 분석 저장 - Clerk 사용자 정보:', {
                     hasUser: !!clerkUser,
                     userId: clerkUser?.id,
@@ -172,9 +177,15 @@ const getAnalysisHistory = async (req, res) => {
 
         console.log('✅ Supabase 연결 확인됨');
         
-        const clerkUser = req.headers['x-clerk-user'] ? JSON.parse(req.headers['x-clerk-user']) : null;
+        let clerkUser = null;
+        try {
+            clerkUser = req.headers['x-clerk-user'] ? JSON.parse(req.headers['x-clerk-user']) : null;
+        } catch (parseError) {
+            console.error('❌ x-clerk-user 헤더 파싱 실패:', parseError.message);
+            return res.status(400).json({ success: false, message: '인증 정보 파싱 실패' });
+        }
         console.log('👤 Clerk 사용자 정보:', clerkUser ? '존재함' : '없음');
-        
+
         // 보안 검증
         try {
             validateUserAccess(clerkUser);
@@ -243,11 +254,17 @@ const getAnalysisResult = async (req, res) => {
 
         const { id } = req.params;
         console.log('🔍 요청된 분석 ID:', id);
-        
-        const clerkUser = req.headers['x-clerk-user'] ? JSON.parse(req.headers['x-clerk-user']) : null;
+
+        let clerkUser = null;
+        try {
+            clerkUser = req.headers['x-clerk-user'] ? JSON.parse(req.headers['x-clerk-user']) : null;
+        } catch (parseError) {
+            console.error('❌ x-clerk-user 헤더 파싱 실패:', parseError.message);
+            return res.status(400).json({ success: false, message: '인증 정보 파싱 실패' });
+        }
         console.log('👤 Clerk 사용자 정보:', clerkUser ? '존재함' : '없음');
         console.log('👤 Clerk 사용자 ID:', clerkUser?.id);
-        
+
         // 보안 검증
         try {
             validateUserAccess(clerkUser);
@@ -333,8 +350,14 @@ const deleteAnalysisResult = async (req, res) => {
         }
 
         const { id } = req.params;
-        const clerkUser = req.headers['x-clerk-user'] ? JSON.parse(req.headers['x-clerk-user']) : null;
-        
+        let clerkUser = null;
+        try {
+            clerkUser = req.headers['x-clerk-user'] ? JSON.parse(req.headers['x-clerk-user']) : null;
+        } catch (parseError) {
+            console.error('❌ x-clerk-user 헤더 파싱 실패:', parseError.message);
+            return res.status(400).json({ success: false, message: '인증 정보 파싱 실패' });
+        }
+
         // 보안 검증
         try {
             validateUserAccess(clerkUser);
@@ -406,8 +429,14 @@ const deleteAllAnalysisResults = async (req, res) => {
             });
         }
 
-        const clerkUser = req.headers['x-clerk-user'] ? JSON.parse(req.headers['x-clerk-user']) : null;
-        
+        let clerkUser = null;
+        try {
+            clerkUser = req.headers['x-clerk-user'] ? JSON.parse(req.headers['x-clerk-user']) : null;
+        } catch (parseError) {
+            console.error('❌ x-clerk-user 헤더 파싱 실패:', parseError.message);
+            return res.status(400).json({ success: false, message: '인증 정보 파싱 실패' });
+        }
+
         // 보안 검증
         try {
             validateUserAccess(clerkUser);

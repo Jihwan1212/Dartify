@@ -1496,11 +1496,19 @@ async function loadAnalysisHistory() {
             if (data.success) {
                 analysisHistory = data.history || [];
                 renderAnalysisHistory();
+            } else {
+                console.error('분석 기록 로드 실패 (서버 응답):', data.message);
+                analysisHistory = [];
+                renderAnalysisHistory();
             }
+        } else {
+            const errorData = await response.json().catch(() => ({}));
+            console.error('분석 기록 로드 실패 (HTTP', response.status, '):', errorData.message);
+            analysisHistory = [];
+            renderAnalysisHistory();
         }
     } catch (error) {
         console.error('분석 기록 로드 실패:', error);
-        // 오류 발생 시 빈 배열로 초기화
         analysisHistory = [];
         renderAnalysisHistory();
     }

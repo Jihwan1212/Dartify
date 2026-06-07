@@ -1,7 +1,7 @@
 const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config();
 
-const supabaseUrl = process.env.SUPABASE_URL || 'https://gzzgdpsqsvfnyifhvbnr.supabase.co';
+const supabaseUrl = process.env.SUPABASE_URL || 'https://rtvpjhyueopkvczzqxab.supabase.co';
 // 환경 변수에서만 키를 가져오도록 수정
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
