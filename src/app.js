@@ -61,7 +61,7 @@ app.use((error, req, res, next) => {
   
   if (error instanceof multer.MulterError) {
     if (error.code === 'LIMIT_FILE_SIZE') {
-      return res.status(400).json({ error: '파일 크기가 10MB를 초과합니다.' });
+      return res.status(400).json({ error: '파일 크기가 30MB를 초과합니다.' });
     }
     if (error.code === 'LIMIT_UNEXPECTED_FILE') {
       return res.status(400).json({ error: '예상치 못한 파일이 업로드되었습니다.' });

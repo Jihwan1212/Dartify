@@ -38,3 +38,9 @@ node_modules/
 
 # dotenv environment variables file
 .env
+
+# macOS
+.DS_Store
+
+# 사용자 업로드/분석 테스트 산출물
+uploads/

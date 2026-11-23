@@ -621,8 +621,8 @@ function handleFile(file) {
             return;
         }
         
-        if (file.size > 10 * 1024 * 1024) { // 10MB
-            showNotification('파일 크기가 10MB를 초과합니다.', 'error');
+        if (file.size > 30 * 1024 * 1024) { // 30MB
+            showNotification('파일 크기가 30MB를 초과합니다.', 'error');
             return;
         }
         

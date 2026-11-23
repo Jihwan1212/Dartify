@@ -224,6 +224,11 @@ const disclosureTypes = {
 - 세부 내용은 \`###\` (삼중 샵)으로 구분하세요
 - 가장 중요한 제목은 \`#\` (단일 샵)으로 시작하세요`
       },
+      stockSecuritiesValuation: {
+        name: '증권신고서(지분증권) - 공모가 산정 근거 분석',
+        mode: 'structured', // ipoValuationService로 처리: 섹션 추출 → JSON 구조화 → 원문 대조·재계산
+        prompt: ''
+      },
       debtSecurities: {
         name: '증권신고서(채무증권)',
         prompt: `이 문서는 '채무증권 관련 증권신고서(CB, BW 등)'입니다. 다음 기준에 따라 정리해주세요:

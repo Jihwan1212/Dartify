@@ -30,7 +30,7 @@ const upload = multer({
         }
     },
     limits: {
-        fileSize: 10 * 1024 * 1024 // 10MB
+        fileSize: 30 * 1024 * 1024 // 30MB (증권신고서는 10MB를 넘는 경우가 있음)
     }
 });
 

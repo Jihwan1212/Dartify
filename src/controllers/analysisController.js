@@ -1,15 +1,10 @@
-const { OpenAI } = require('openai');
 const pdf = require('pdf-parse');
 const fs = require('fs');
 const { supabase, getUserSpecificSupabase, validateUserAccess } = require('../config/supabase');
 const markdownService = require('../services/markdownService');
-const openaiService = require('../services/openaiService');
+const claudeService = require('../services/claudeService');
+const ipoValuationService = require('../services/ipoValuationService');
 const path = require('path');
-
-// OpenAI 클라이언트 초기화 (백업용)
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
-});
 
 // 문서 분석
 const analyzeDocument = async (req, res) => {
@@ -68,12 +63,19 @@ const analyzeDocument = async (req, res) => {
         console.log('원본 파일명:', file.originalname);
         console.log('처리된 파일명:', safeFilename);
 
-        // openaiService를 사용하여 분석
-        const analysisResult = await openaiService.analyzeDocument(
-            pdfData.text, 
-            disclosureType, 
-            specificType
-        );
+        // claudeService를 사용하여 분석
+        let analysisResult;
+        if (specificType === 'stockSecuritiesValuation') {
+            // 공모가 산정 근거: 필요한 구간만 AI에 보내고, 추출 수치를 원문 대조·재계산으로 검증
+            const ipo = await ipoValuationService.analyze(pdfData.text);
+            analysisResult = ipo.markdown;
+        } else {
+            analysisResult = await claudeService.analyzeDocument(
+                pdfData.text,
+                disclosureType,
+                specificType
+            );
+        }
 
         // Supabase에 저장
         if (supabase) {
