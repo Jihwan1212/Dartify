@@ -29,6 +29,9 @@ const analysisType = document.getElementById('analysisType');
 
 // 초기화
 document.addEventListener('DOMContentLoaded', async function() {
+    // 사이드바 초기 상태(모바일=닫힘, 데스크톱=열림)를 명시적으로 지정
+    initSidebarState();
+
     // 기본 로그인 버튼을 즉시 표시
     showDefaultLoginButton();
     
@@ -1460,17 +1463,39 @@ document.head.appendChild(style);
 function toggleSidebar() {
     const sidebar = document.getElementById('analysisSidebar');
     const toggleBtn = document.getElementById('sidebarToggleBtn');
-    
-    if (sidebar.classList.contains('closed')) {
+
+    if (sidebar.classList.contains('open')) {
+        // 사이드바 닫기
+        sidebar.classList.remove('open');
+        sidebar.classList.add('closed');
+        toggleBtn.classList.remove('open');
+        toggleBtn.classList.add('closed');
+    } else {
         // 사이드바 열기
         sidebar.classList.remove('closed');
+        sidebar.classList.add('open');
         toggleBtn.classList.remove('closed');
         toggleBtn.classList.add('open');
-    } else {
-        // 사이드바 닫기
+    }
+}
+
+// 사이드바 초기 상태: 화면 크기에 맞춰 open/closed 클래스를 명시적으로 지정한다
+// (클래스가 없는 상태에 의존하면 데스크톱 기본값과 모바일 기본값이 CSS에서만 다르고
+// toggleSidebar()가 참조하는 클래스와 어긋나 토글이 꼬인다)
+function initSidebarState() {
+    const sidebar = document.getElementById('analysisSidebar');
+    const toggleBtn = document.getElementById('sidebarToggleBtn');
+    const isMobile = window.innerWidth <= 768;
+
+    sidebar.classList.remove('open', 'closed');
+    toggleBtn.classList.remove('open', 'closed');
+
+    if (isMobile) {
         sidebar.classList.add('closed');
         toggleBtn.classList.add('closed');
-        toggleBtn.classList.remove('open');
+    } else {
+        sidebar.classList.add('open');
+        toggleBtn.classList.add('open');
     }
 }
 

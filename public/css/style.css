@@ -1931,6 +1931,14 @@ body {
         align-items: flex-start;
         padding: 24px 20px 16px 20px;
     }
+
+    /* 모바일에서는 결과 박스 안에 별도 스크롤을 두지 않고 페이지 스크롤에 자연스럽게 포함시킨다
+       (작은 화면에서 내부 스크롤 상자에 갇히면 전체 리포트를 읽기 어려움) */
+    .result-content {
+        max-height: none;
+        min-height: 0;
+        overflow-y: visible;
+    }
     
     .result-actions {
         width: 100%;
@@ -2120,10 +2128,9 @@ body {
     }
     
     .result-content {
-        max-height: 70vh;
-        min-height: 400px;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
+        max-height: none;
+        min-height: 0;
+        overflow-y: visible;
         padding: 16px;
     }
     
@@ -2854,10 +2861,11 @@ body {
         left: 335px; /* 모바일에서도 위치 조정 */
     }
     
-    .analysis-sidebar.open ~ .container {
-        margin-left: 0; /* 모바일에서는 메인 컨텐츠가 밀리지 않음 */
+    .analysis-sidebar.open ~ .container,
+    .analysis-sidebar.closed ~ .container {
+        margin-left: 0; /* 모바일에서는 사이드바 상태와 무관하게 메인 컨텐츠가 밀리지 않음 */
     }
-    
+
     .container {
         margin-left: 0; /* 모바일에서는 여백 없음 */
         max-width: 100vw;
@@ -3321,5 +3329,6 @@ body {
     .notion-table td {
         padding: 8px 12px;
         font-size: 0.8rem;
+        white-space: nowrap; /* 한글이 음절 단위로 이상하게 끊기지 않도록, 좁으면 가로 스크롤(overflow-x: auto)로 처리 */
     }
 }
