@@ -1922,12 +1922,14 @@ body {
 
     /* 모바일에서는 섹션 사이 여백을 줄여서 화면이 한눈에 들어오게 한다 */
     .main-header {
-        margin-bottom: 28px;
-        padding: 32px 0 20px 0;
+        margin-bottom: 20px;
+        padding: 24px 0 12px 0;
     }
 
     .header-badge {
-        margin-bottom: 18px;
+        font-size: 0.75rem;
+        padding: 5px 12px;
+        margin-bottom: 14px;
     }
 
     .main-content {
@@ -1935,11 +1937,11 @@ body {
     }
 
     .main-title {
-        font-size: 2.5rem;
+        font-size: 1.7rem;
     }
 
     .main-description {
-        font-size: 1.1rem;
+        font-size: 0.9rem;
     }
 
     .disclosure-types {
@@ -1967,9 +1969,35 @@ body {
     }
     
     .upload-card, .disclosure-card, .result-card, .loading-card {
-        padding: 30px 20px;
+        padding: 20px 16px;
     }
-    
+
+    /* 업로드 영역을 Claude 입력창처럼 작고 담백하게 */
+    .upload-area {
+        padding: 22px 16px;
+        border-width: 2px;
+    }
+
+    .upload-area i {
+        font-size: 1.8rem;
+        margin-bottom: 10px;
+    }
+
+    .upload-area h3 {
+        font-size: 1.05rem;
+        margin-bottom: 6px;
+    }
+
+    .upload-area p {
+        font-size: 0.85rem;
+        margin-bottom: 16px;
+    }
+
+    .upload-btn {
+        padding: 10px 22px;
+        font-size: 0.95rem;
+    }
+
     .loading-card {
         padding: 30px 20px;
     }
@@ -2140,14 +2168,19 @@ body {
     }
     
     .main-title {
-        font-size: 2rem;
+        font-size: 1.3rem;
+        line-height: 1.3;
     }
-    
+
+    .main-description {
+        font-size: 0.82rem;
+    }
+
     .header-badge {
-        font-size: 0.8rem;
-        padding: 6px 12px;
+        font-size: 0.7rem;
+        padding: 4px 10px;
     }
-    
+
     .result-content {
         max-height: none;
         min-height: 0;
