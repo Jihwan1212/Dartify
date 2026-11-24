@@ -687,6 +687,68 @@ body {
     max-width: calc(100vw - 380px);
 }
 
+/* 사용법 안내 캐러셀 - 모바일 전용, 데스크톱에서는 숨김 */
+.onboarding-carousel-section {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .onboarding-carousel-section {
+        display: block;
+        margin: 0 0 20px 0;
+    }
+
+    .onboarding-carousel {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        gap: 12px;
+        padding: 4px 24px;
+        scrollbar-width: none;
+    }
+
+    .onboarding-carousel::-webkit-scrollbar {
+        display: none;
+    }
+
+    .onboarding-slide {
+        flex: 0 0 100%;
+        scroll-snap-align: center;
+    }
+
+    .onboarding-slide img {
+        width: 100%;
+        display: block;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        border: 1px solid #f0f0f0;
+    }
+
+    .onboarding-dots {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        margin-top: 12px;
+    }
+
+    .onboarding-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #e0e0e0;
+        cursor: pointer;
+        transition: all 0.25s ease;
+    }
+
+    .onboarding-dot.active {
+        width: 20px;
+        border-radius: 4px;
+        background: #667eea;
+    }
+}
+
 /* 메인 헤더 스타일 */
 .main-header {
     text-align: center;

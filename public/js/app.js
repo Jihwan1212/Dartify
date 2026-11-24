@@ -32,6 +32,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     // 사이드바 초기 상태(모바일=닫힘, 데스크톱=열림)를 명시적으로 지정
     initSidebarState();
 
+    // 사용법 안내 캐러셀 초기화
+    initOnboardingCarousel();
+
     // 기본 로그인 버튼을 즉시 표시
     showDefaultLoginButton();
     
@@ -688,9 +691,11 @@ function resetFileUpload() {
     // 홈화면 다시 표시
     const mainHeader = document.querySelector('.main-header');
     const uploadSection = document.querySelector('.upload-section');
-    
+    const onboardingCarousel = document.querySelector('.onboarding-carousel-section');
+
     if (mainHeader) mainHeader.style.display = 'block';
     if (uploadSection) uploadSection.style.display = 'block';
+    if (onboardingCarousel) onboardingCarousel.style.display = 'block';
     
     // 결과 섹션 숨기기
     resultSection.style.display = 'none';
@@ -1269,10 +1274,12 @@ function displayResult(result) {
     const mainHeader = document.querySelector('.main-header');
     const uploadSection = document.querySelector('.upload-section');
     const disclosureSection = document.querySelector('.disclosure-section');
-    
+    const onboardingCarousel = document.querySelector('.onboarding-carousel-section');
+
     if (mainHeader) mainHeader.style.display = 'none';
     if (uploadSection) uploadSection.style.display = 'none';
     if (disclosureSection) disclosureSection.style.display = 'none';
+    if (onboardingCarousel) onboardingCarousel.style.display = 'none';
     
     // 파일 정보 표시
     if (analysisInfo) {
@@ -1497,6 +1504,43 @@ function initSidebarState() {
         sidebar.classList.add('open');
         toggleBtn.classList.add('open');
     }
+}
+
+// 사용법 안내 캐러셀: 스와이프 위치에 맞춰 점 표시 갱신, 점 클릭 시 해당 슬라이드로 이동
+function initOnboardingCarousel() {
+    const track = document.getElementById('onboardingTrack');
+    const dots = document.querySelectorAll('.onboarding-dot');
+    if (!track || dots.length === 0) return;
+
+    const slides = track.querySelectorAll('.onboarding-slide');
+
+    track.addEventListener('scroll', () => {
+        const trackCenter = track.scrollLeft + track.clientWidth / 2;
+        let closestIndex = 0;
+        let closestDist = Infinity;
+
+        slides.forEach((slide, i) => {
+            const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
+            const dist = Math.abs(trackCenter - slideCenter);
+            if (dist < closestDist) {
+                closestDist = dist;
+                closestIndex = i;
+            }
+        });
+
+        dots.forEach((dot, i) => dot.classList.toggle('active', i === closestIndex));
+    });
+
+    dots.forEach((dot, i) => {
+        dot.addEventListener('click', () => {
+            const slide = slides[i];
+            if (!slide) return;
+            track.scrollTo({
+                left: slide.offsetLeft - (track.clientWidth - slide.offsetWidth) / 2,
+                behavior: 'smooth',
+            });
+        });
+    });
 }
 
 // 분석 기록 로드
@@ -1918,10 +1962,12 @@ function displayAnalysisResult(result) {
     const mainHeader = document.querySelector('.main-header');
     const uploadSection = document.querySelector('.upload-section');
     const disclosureSection = document.querySelector('.disclosure-section');
-    
+    const onboardingCarousel = document.querySelector('.onboarding-carousel-section');
+
     if (mainHeader) mainHeader.style.display = 'none';
     if (uploadSection) uploadSection.style.display = 'none';
     if (disclosureSection) disclosureSection.style.display = 'none';
+    if (onboardingCarousel) onboardingCarousel.style.display = 'none';
     
     // 파일명 처리 - UTF-8 인코딩 문제 해결
     let displayFilename = result.filename;
@@ -2012,10 +2058,12 @@ function goToHome() {
     const mainHeader = document.querySelector('.main-header');
     const uploadSection = document.querySelector('.upload-section');
     const disclosureSection = document.querySelector('.disclosure-section');
-    
+    const onboardingCarousel = document.querySelector('.onboarding-carousel-section');
+
     if (mainHeader) mainHeader.style.display = 'block';
     if (uploadSection) uploadSection.style.display = 'block';
     if (disclosureSection) disclosureSection.style.display = 'none';
+    if (onboardingCarousel) onboardingCarousel.style.display = 'block';
     
     // 결과 섹션과 로딩 섹션 숨기기
     if (resultSection) resultSection.style.display = 'none';
