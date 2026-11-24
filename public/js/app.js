@@ -1541,6 +1541,21 @@ function initOnboardingCarousel() {
             });
         });
     });
+
+    // 물음표 토글: 기본은 숨김, 누르면 펼치면서 항상 첫 번째 이미지부터 보여준다
+    const toggleBtn = document.getElementById('onboardingHelpToggle');
+    const wrap = document.getElementById('onboardingWrap');
+    if (toggleBtn && wrap) {
+        toggleBtn.addEventListener('click', () => {
+            const isOpen = wrap.classList.toggle('open');
+            toggleBtn.classList.toggle('open', isOpen);
+
+            if (isOpen) {
+                track.scrollTo({ left: 0, behavior: 'instant' });
+                dots.forEach((dot, i) => dot.classList.toggle('active', i === 0));
+            }
+        });
+    }
 }
 
 // 분석 기록 로드

@@ -695,7 +695,35 @@ body {
 @media (max-width: 768px) {
     .onboarding-carousel-section {
         display: block;
-        margin: 0 0 20px 0;
+        margin: 0 0 8px 0;
+        text-align: center;
+    }
+
+    .onboarding-help-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(102, 126, 234, 0.08);
+        color: #667eea;
+        border: 1px solid rgba(102, 126, 234, 0.2);
+        border-radius: 20px;
+        padding: 6px 14px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    .onboarding-help-toggle.open {
+        background: rgba(102, 126, 234, 0.14);
+    }
+
+    .onboarding-carousel-wrap {
+        display: none;
+        margin-top: 10px;
+    }
+
+    .onboarding-carousel-wrap.open {
+        display: block;
     }
 
     .onboarding-carousel {
@@ -1879,6 +1907,11 @@ body {
    .footer 자체에도 margin-left: 40%; margin-right: 20%; 가 잘못 걸려 있어서
    모바일 화면에서 푸터 박스가 화면 폭의 40%로 좁아져 글자가 이상하게 끊겨 보였음) */
 @media (max-width: 768px) {
+    .footer {
+        margin-top: 16px;
+        padding: 16px 15px;
+    }
+
     .footer-content {
         gap: 12px;
     }
@@ -1984,14 +2017,14 @@ body {
 
     /* 모바일에서는 섹션 사이 여백을 줄여서 화면이 한눈에 들어오게 한다 */
     .main-header {
-        margin-bottom: 20px;
-        padding: 24px 0 12px 0;
+        margin-bottom: 10px;
+        padding: 16px 0 8px 0;
     }
 
     .header-badge {
         font-size: 0.75rem;
         padding: 5px 12px;
-        margin-bottom: 14px;
+        margin-bottom: 8px;
     }
 
     .main-content {
@@ -2031,12 +2064,12 @@ body {
     }
     
     .upload-card, .disclosure-card, .result-card, .loading-card {
-        padding: 20px 16px;
+        padding: 16px 16px;
     }
 
     /* 업로드 영역을 Claude 입력창처럼 작고 담백하게 */
     .upload-area {
-        padding: 22px 16px;
+        padding: 16px 16px;
         border-width: 2px;
     }
 
@@ -2996,8 +3029,9 @@ body {
         margin-left: 0; /* 모바일에서는 여백 없음 */
         max-width: 100vw;
         padding: 15px;
+        min-height: 0; /* 콘텐츠가 짧아도 화면 높이만큼 억지로 늘어나지 않게 (안 그러면 푸터가 화면 아래로 밀려나 스크롤이 생김) */
     }
-    
+
     .login-required-card {
         padding: 30px 20px;
     }

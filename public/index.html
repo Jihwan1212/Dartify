@@ -77,23 +77,29 @@
             </div>
         </header>
 
-        <!-- 사용법 안내 캐러셀 (모바일 전용) -->
+        <!-- 사용법 안내 캐러셀 (모바일 전용, 기본은 접힘) -->
         <section class="onboarding-carousel-section" id="onboardingCarousel">
-            <div class="onboarding-carousel" id="onboardingTrack">
-                <div class="onboarding-slide">
-                    <img src="images/onboarding/step-1-upload.png" alt="1. PDF 업로드 및 공시 유형 선택">
+            <button class="onboarding-help-toggle" id="onboardingHelpToggle" type="button">
+                <i class="fas fa-question-circle"></i>
+                <span>사용법 보기</span>
+            </button>
+            <div class="onboarding-carousel-wrap" id="onboardingWrap">
+                <div class="onboarding-carousel" id="onboardingTrack">
+                    <div class="onboarding-slide">
+                        <img src="images/onboarding/step-1-upload.png" alt="1. PDF 업로드 및 공시 유형 선택">
+                    </div>
+                    <div class="onboarding-slide">
+                        <img src="images/onboarding/step-2-analyzing.png" alt="2. AI가 문서를 분석하는 중">
+                    </div>
+                    <div class="onboarding-slide">
+                        <img src="images/onboarding/step-3-result.png" alt="3. 분석 결과 확인">
+                    </div>
                 </div>
-                <div class="onboarding-slide">
-                    <img src="images/onboarding/step-2-analyzing.png" alt="2. AI가 문서를 분석하는 중">
+                <div class="onboarding-dots">
+                    <span class="onboarding-dot active" data-index="0"></span>
+                    <span class="onboarding-dot" data-index="1"></span>
+                    <span class="onboarding-dot" data-index="2"></span>
                 </div>
-                <div class="onboarding-slide">
-                    <img src="images/onboarding/step-3-result.png" alt="3. 분석 결과 확인">
-                </div>
-            </div>
-            <div class="onboarding-dots">
-                <span class="onboarding-dot active" data-index="0"></span>
-                <span class="onboarding-dot" data-index="1"></span>
-                <span class="onboarding-dot" data-index="2"></span>
             </div>
         </section>
 
