@@ -11,6 +11,8 @@ body {
     min-height: 100vh;
     color: #333;
     line-height: 1.6;
+    word-break: keep-all; /* 한글이 음절 단위로 이상하게 끊기지 않도록 */
+    overflow-wrap: break-word; /* 그래도 너무 긴 단어는 넘치지 않게 필요한 경우만 줄바꿈 */
 }
 
 /* 상단 네비게이션 바 */
@@ -1802,33 +1804,38 @@ body {
 }
 
 /* 푸터 */
-    .footer {
-        text-align: center;
-        padding: 25px 15px;
-        margin-top: 40px;
-        max-width: 800px;
-        margin-left: 40%;
-        margin-right: 20%;
-    }
-    
+.footer {
+    text-align: center;
+    padding: 25px 15px;
+    margin-top: 40px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* 모바일에서는 푸터를 좀 더 촘촘하게 (이 블록은 원래 미디어쿼리 밖에 있던 버그로,
+   .footer 자체에도 margin-left: 40%; margin-right: 20%; 가 잘못 걸려 있어서
+   모바일 화면에서 푸터 박스가 화면 폭의 40%로 좁아져 글자가 이상하게 끊겨 보였음) */
+@media (max-width: 768px) {
     .footer-content {
         gap: 12px;
     }
-    
+
     .footer-developer {
         gap: 6px;
         padding-top: 12px;
         max-width: 350px;
     }
-    
+
     .footer-developer p {
         font-size: 0.85rem;
     }
-    
+
     .version {
         padding: 3px 10px;
         font-size: 0.75rem;
     }
+}
 
 .footer-content {
     display: flex;
@@ -1912,15 +1919,29 @@ body {
     .container {
         padding: 15px;
     }
-    
+
+    /* 모바일에서는 섹션 사이 여백을 줄여서 화면이 한눈에 들어오게 한다 */
+    .main-header {
+        margin-bottom: 28px;
+        padding: 32px 0 20px 0;
+    }
+
+    .header-badge {
+        margin-bottom: 18px;
+    }
+
+    .main-content {
+        gap: 16px;
+    }
+
     .main-title {
         font-size: 2.5rem;
     }
-    
+
     .main-description {
         font-size: 1.1rem;
     }
-    
+
     .disclosure-types {
         grid-template-columns: 1fr;
     }
@@ -2197,6 +2218,16 @@ body {
     align-items: center;
     min-height: 400px;
     padding: 40px 0;
+}
+
+/* 모바일에서는 섹션마다 억지로 400px를 채우지 않고 내용 높이만큼만 차지하게 한다
+   (이 규칙이 미디어쿼리 밖에 있어서, 앞쪽 768px 미디어쿼리의 같은 선택자 오버라이드를
+   소스 순서상 다시 덮어쓰고 있었음) */
+@media (max-width: 768px) {
+    .upload-section, .disclosure-section, .result-section, .loading-section {
+        min-height: 0;
+        padding: 12px 0;
+    }
 }
 
 .result-section {
