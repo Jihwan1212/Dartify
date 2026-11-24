@@ -687,93 +687,98 @@ body {
     max-width: calc(100vw - 380px);
 }
 
-/* 사용법 안내 캐러셀 - 모바일 전용, 데스크톱에서는 숨김 */
+/* 사용법 안내 캐러셀 - 데스크톱·모바일 공통 (PC에서는 가운데 정렬 + 폭 제한) */
 .onboarding-carousel-section {
+    display: block;
+    max-width: 600px;
+    margin: 0 auto 20px auto;
+    text-align: center;
+}
+
+.onboarding-help-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(102, 126, 234, 0.08);
+    color: #667eea;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.onboarding-help-toggle:hover {
+    background: rgba(102, 126, 234, 0.14);
+}
+
+.onboarding-help-toggle.open {
+    background: rgba(102, 126, 234, 0.14);
+}
+
+.onboarding-carousel-wrap {
     display: none;
+    margin-top: 10px;
+}
+
+.onboarding-carousel-wrap.open {
+    display: block;
+}
+
+.onboarding-carousel {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 12px;
+    padding: 4px 24px;
+    scrollbar-width: none;
+}
+
+.onboarding-carousel::-webkit-scrollbar {
+    display: none;
+}
+
+.onboarding-slide {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+}
+
+.onboarding-slide img {
+    width: 100%;
+    display: block;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    border: 1px solid #f0f0f0;
+}
+
+.onboarding-dots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.onboarding-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.onboarding-dot.active {
+    width: 20px;
+    border-radius: 4px;
+    background: #667eea;
 }
 
 @media (max-width: 768px) {
     .onboarding-carousel-section {
-        display: block;
         margin: 0 0 8px 0;
-        text-align: center;
-    }
-
-    .onboarding-help-toggle {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: rgba(102, 126, 234, 0.08);
-        color: #667eea;
-        border: 1px solid rgba(102, 126, 234, 0.2);
-        border-radius: 20px;
-        padding: 6px 14px;
-        font-size: 0.8rem;
-        font-weight: 500;
-        cursor: pointer;
-    }
-
-    .onboarding-help-toggle.open {
-        background: rgba(102, 126, 234, 0.14);
-    }
-
-    .onboarding-carousel-wrap {
-        display: none;
-        margin-top: 10px;
-    }
-
-    .onboarding-carousel-wrap.open {
-        display: block;
-    }
-
-    .onboarding-carousel {
-        display: flex;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
-        gap: 12px;
-        padding: 4px 24px;
-        scrollbar-width: none;
-    }
-
-    .onboarding-carousel::-webkit-scrollbar {
-        display: none;
-    }
-
-    .onboarding-slide {
-        flex: 0 0 100%;
-        scroll-snap-align: center;
-    }
-
-    .onboarding-slide img {
-        width: 100%;
-        display: block;
-        border-radius: 16px;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-        border: 1px solid #f0f0f0;
-    }
-
-    .onboarding-dots {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 8px;
-        margin-top: 12px;
-    }
-
-    .onboarding-dot {
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        background: #e0e0e0;
-        cursor: pointer;
-        transition: all 0.25s ease;
-    }
-
-    .onboarding-dot.active {
-        width: 20px;
-        border-radius: 4px;
-        background: #667eea;
     }
 }
 
@@ -1913,7 +1918,7 @@ body {
     }
 
     .footer-content {
-        gap: 12px;
+        gap: 8px;
     }
 
     .footer-developer {
@@ -1946,6 +1951,13 @@ body {
     font-size: 0.95rem;
     margin: 0;
     line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+    .footer-main p {
+        font-size: 0.65rem;
+        white-space: nowrap;
+    }
 }
 
 .footer-developer {
