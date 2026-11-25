@@ -727,6 +727,7 @@ body {
 }
 
 .onboarding-carousel {
+    position: relative;
     display: flex;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
@@ -743,6 +744,7 @@ body {
 .onboarding-slide {
     flex: 0 0 100%;
     scroll-snap-align: center;
+    cursor: pointer;
 }
 
 .onboarding-slide img {

@@ -1531,15 +1531,22 @@ function initOnboardingCarousel() {
         dots.forEach((dot, i) => dot.classList.toggle('active', i === closestIndex));
     });
 
-    dots.forEach((dot, i) => {
-        dot.addEventListener('click', () => {
-            const slide = slides[i];
-            if (!slide) return;
-            track.scrollTo({
-                left: slide.offsetLeft - (track.clientWidth - slide.offsetWidth) / 2,
-                behavior: 'smooth',
-            });
+    const goToSlide = (index) => {
+        const slide = slides[index];
+        if (!slide) return;
+        track.scrollTo({
+            left: slide.offsetLeft - (track.clientWidth - slide.offsetWidth) / 2,
+            behavior: 'smooth',
         });
+    };
+
+    dots.forEach((dot, i) => {
+        dot.addEventListener('click', () => goToSlide(i));
+    });
+
+    // 이미지 클릭 시 다음 슬라이드로 이동 (마지막 이미지는 첫 이미지로 순환)
+    slides.forEach((slide, i) => {
+        slide.addEventListener('click', () => goToSlide((i + 1) % slides.length));
     });
 
     // 물음표 토글: 기본은 숨김, 누르면 펼치면서 항상 첫 번째 이미지부터 보여준다
